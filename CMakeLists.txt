@@ -28,6 +28,21 @@ link_directories(
     ${GAZEBO_LIBRARY_DIRS}
 )
 
+catkin_install_python(PROGRAMS
+                      talker_listener_pkg/talker.py
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+                      )
+
+catkin_install_python(PROGRAMS
+                    thorvald_command_pkg/command_publisher.py
+                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+                    )
+
+catkin_install_python(PROGRAMS
+                    velodyne_simulator_pkgs/pcl2_subscriber.py
+                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+                    )
+
 add_library(gazebo_ros_velodyne_laser velodyne_simulator_pkgs/src/GazeboRosVelodyneLaser.cpp)
     target_link_libraries(gazebo_ros_velodyne_laser
     ${catkin_LIBRARIES}
@@ -54,13 +69,3 @@ install(DIRECTORY velodyne_simulator_pkgs/include/${PROJECT_NAME}/
 install(DIRECTORY launch meshes rviz urdf world
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-catkin_install_python(PROGRAMS
-                      talker_listener_pkg/talker.py
-                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-                      )
-
-catkin_install_python(PROGRAMS
-                    thorvald_command_pkg/command_publisher.py
-                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-                    )
