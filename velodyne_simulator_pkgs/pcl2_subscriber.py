@@ -80,7 +80,7 @@ class PointCloudSubscriberNode():
     
     def callback(self, msg):
         xyz_array = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(msg)
-        ransac = RANSAC(xyz_array, max_iterations=50, distance_ratio_threshold=0.1)
+        ransac = RANSAC(xyz_array, max_iterations=10, distance_ratio_threshold=0.1)
         inlier, outlier = ransac.ransac_algorithm()
         print("I have recieved a Pointcloud with message: ", len(xyz_array), len(inlier), len(outlier))
         
