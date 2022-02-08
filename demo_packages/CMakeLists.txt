@@ -57,7 +57,7 @@ install(TARGETS gazebo_ros_velodyne_laser gazebo_ros_velodyne_gpu_laser
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
-install(DIRECTORY velodyne_simulator_pkgs/include/${PROJECT_NAME}/
+install(DIRECTORY velodyne_simulator/include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 

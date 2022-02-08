@@ -6,7 +6,7 @@
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   <arg name="verbose" default="false"/>
-  <arg name="world_name" default="$(find tel211)/velodyne_simulator_pkgs/world/example.world"/>
+  <arg name="world_name" default="$(find demo_packages)/velodyne_simulator/world/example.world"/>
 
   <!-- Start gazebo and load the world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch" >
@@ -22,7 +22,7 @@
   <!-- Spawn the example robot -->
   <arg name="gpu" default="false"/>
   <arg name="organize_cloud" default="false"/>
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find tel211)/velodyne_simulator_pkgs/urdf/example.urdf.xacro' organize_cloud:=$(arg organize_cloud) gpu:=$(arg gpu)" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find demo_packages)/velodyne_simulator/urdf/example.urdf.xacro' organize_cloud:=$(arg organize_cloud) gpu:=$(arg gpu)" />
   <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-urdf -param /robot_description -model example"/>
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="30.0" />
@@ -30,6 +30,6 @@
 
   <!-- RViz -->
   <arg name="rviz" default="true"/>
-  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find tel211)/velodyne_simulator_pkgs/rviz/example.rviz" />
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find demo_packages)/velodyne_simulator/rviz/example.rviz" />
 
 </launch>

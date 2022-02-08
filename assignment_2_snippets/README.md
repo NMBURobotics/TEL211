@@ -20,7 +20,7 @@ source ~/catkin_ws/devel/setup.bash
 roslaunch talker_listener_pkg start_nodes.launch
 ```
 
-You can run nodes with either given launch file;
+Or You can run nodes `rosrun`;
 
 ```bash
 source ~/catkin_ws/devel/setup.bash
