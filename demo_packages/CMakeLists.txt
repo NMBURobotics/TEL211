@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 
-project(tel211)
+project(demo_packages)
 
 find_package(catkin REQUIRED COMPONENTS 
 roscpp
@@ -19,7 +19,7 @@ catkin_package(
     CATKIN_DEPENDS roscpp sensor_msgs tf gazebo_ros message_generation std_msgs geometry_msgs)
 
 include_directories(
-    velodyne_simulator_pkgs/include
+    velodyne_simulator/include
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
 )
@@ -29,17 +29,12 @@ link_directories(
 )
 
 catkin_install_python(PROGRAMS
-                      talker_listener_pkg/talker.py
-                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-                      )
-
-catkin_install_python(PROGRAMS
-                    thorvald_command_pkg/command_publisher.py
+                    thorvald_command/command_publisher.py
                     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
                     )
 
 catkin_install_python(PROGRAMS
-                    velodyne_simulator_pkgs/pcl2_subscriber.py
+                    velodyne_simulator/pcl2_subscriber.py
                     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
                     )
 
