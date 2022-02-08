@@ -14,7 +14,7 @@ find_package(gazebo REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 catkin_package(
-    INCLUDE_DIRS velodyne_simulator_pkgs/include ${GAZEBO_INCLUDE_DIRS}
+    INCLUDE_DIRS velodyne_simulator/include ${GAZEBO_INCLUDE_DIRS}
     LIBRARIES gazebo_ros_velodyne_laser gazebo_ros_velodyne_gpu_laser    
     CATKIN_DEPENDS roscpp sensor_msgs tf gazebo_ros message_generation std_msgs geometry_msgs)
 
@@ -38,14 +38,14 @@ catkin_install_python(PROGRAMS
                     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
                     )
 
-add_library(gazebo_ros_velodyne_laser velodyne_simulator_pkgs/src/GazeboRosVelodyneLaser.cpp)
+add_library(gazebo_ros_velodyne_laser velodyne_simulator/src/GazeboRosVelodyneLaser.cpp)
     target_link_libraries(gazebo_ros_velodyne_laser
     ${catkin_LIBRARIES}
     ${GAZEBO_LIBRARIES}
     RayPlugin
 )
 
-add_library(gazebo_ros_velodyne_gpu_laser velodyne_simulator_pkgs/src/GazeboRosVelodyneLaser.cpp)
+add_library(gazebo_ros_velodyne_gpu_laser velodyne_simulator/src/GazeboRosVelodyneLaser.cpp)
     target_link_libraries(gazebo_ros_velodyne_gpu_laser
     ${catkin_LIBRARIES}
     ${GAZEBO_LIBRARIES}

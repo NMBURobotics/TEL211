@@ -7,11 +7,9 @@ roscpp
 rospy
 std_msgs 
 geometry_msgs)
-find_package(gazebo REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 catkin_package(
-    CATKIN_DEPENDS roscpp  std_msgs geometry_msgs)
+    CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs)
 
 catkin_install_python(PROGRAMS
                       src/talker.py
