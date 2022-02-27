@@ -39,7 +39,7 @@ string[] folders
 
 In a terminal launch the serve node;
 
-> rosrun service_server_client_pkg server.py
+> rosrun service_server_client_pkg list_folders_server.py
 
 In a seperate terminal call the service with; 
 

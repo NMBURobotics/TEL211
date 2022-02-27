@@ -19,14 +19,14 @@ catkin_package(
     CATKIN_DEPENDS rospy std_msgs geometry_msgs message_runtime)
 
 catkin_install_python(PROGRAMS
-                      src/server.py
+                      src/list_folders_server.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
                       )
 
-#catkin_install_python(PROGRAMS
-#                    src/listener.py
-#                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#                    )
+catkin_install_python(PROGRAMS
+                    src/list_folders_client.py
+                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+                    )
 
 install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

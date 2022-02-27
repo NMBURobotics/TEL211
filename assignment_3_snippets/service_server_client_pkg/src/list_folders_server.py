@@ -6,10 +6,10 @@ from service_server_client_pkg.srv import ListFolders, ListFoldersResponse
 import os
 
 
-class ServerNode():
+class ListFoldersServerNode():
 
     def __init__(self, *args):
-        rospy.loginfo("Constructing ServerNode")
+        rospy.loginfo("Constructing ListFoldersServerNode")
         rospy.Service("list_folders", ListFolders, self.list_folders_callback)
 
     def list_folders_callback(self, request):
@@ -20,7 +20,7 @@ class ServerNode():
 
 
 if __name__ == '__main__':
-    node = ServerNode()
-    rospy.init_node('ServerNode', anonymous=False)
+    node = ListFoldersServerNode()
+    rospy.init_node('ListFoldersServerNode', anonymous=False)
     rospy.spin()
-    rospy.loginfo("Shutting down ServerNode")
+    rospy.loginfo("Shutting down ListFoldersServerNode")
