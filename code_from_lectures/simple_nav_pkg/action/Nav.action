@@ -1,8 +1,0 @@
-# goal
-geometry_msgs/PoseStamped goal_pose
----
-# result 
-bool result
----
-#feedback
-float64 progress
