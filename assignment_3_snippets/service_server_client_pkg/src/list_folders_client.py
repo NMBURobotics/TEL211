@@ -18,7 +18,7 @@ class ListFoldersClientNode():
         rospy.loginfo(strings_parameters)
 
         rospy.loginfo(
-            "I can alsO read an int parameter from yaml!")
+            "I can also read an int parameter from yaml!")
 
         # if yet_another_param cannot be found, we return zero as efault value
         int_param = rospy.get_param("yet_another_param", 0)

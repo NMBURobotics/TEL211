@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+from pickle import TRUE
+import rospy
+import actionlib
+
+from navigate_to_pose_pkg.simple_nav_helpers import PurePursuitController
+from navigate_to_pose_pkg.simple_nav_helpers import SimpleNavHelpers
+
+from navigate_to_pose_pkg.msg import NavigateToPoseAction
+from navigate_to_pose_pkg.msg import NavigateToPoseFeedback
+from navigate_to_pose_pkg.msg import NavigateToPoseResult
+
+from geometry_msgs.msg import Twist
+
+
+class NavigateToPoseServerNode():
+    def __init__(self, *args):
+
+        self.feedback = NavigateToPoseFeedback()
+        self.result = NavigateToPoseResult()
+
+        self.action_server = actionlib.SimpleActionServer(
+            "/navigate_to_pose", NavigateToPoseAction, execute_cb=self.server_callback, auto_start=False)
+        self.action_server.start()
+
+        self.cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
+
+        self.helpers = SimpleNavHelpers()
+        self.controller = PurePursuitController(1.0, 5.0, 0.5, 0.5)
+
+        rospy.loginfo("Started naviagte_to_pose action")
+
+    def server_callback(self, goal):
+
+        rospy.loginfo("received a navigation request to a goal")
+        rospy.loginfo(goal.goal_pose)
+
+        rate = rospy.Rate(15)
+
+        dist_tolerance_to_goal_satisfied = False
+        rot_tolerance_to_goal_satisfied = False
+
+        while not (dist_tolerance_to_goal_satisfied and rot_tolerance_to_goal_satisfied) and not rospy.is_shutdown():
+
+            if self.action_server.is_preempt_requested():
+                rospy.loginfo("Action request canceled")
+                self.action_server.set_preempted()
+                break
+
+            curr_robot_pose = self.helpers.get_curr_robot_pose()
+            dist_to_goal = self.helpers.pose_euclidean_dist(
+                curr_robot_pose.pose, goal.goal_pose.pose)
+
+            self.feedback.remaining_distance_to_goal = dist_to_goal
+            self.action_server.publish_feedback(self.feedback)
+            dist_error, rot_error = self.controller.compute_error(
+                curr_robot_pose, goal.goal_pose)
+
+            if dist_error < 0.1:
+                rospy.loginfo(
+                    "We arrived to goal, and now we will correct the heading")
+                dist_tolerance_to_goal_satisfied = True
+
+            if rot_error < 0.1:
+                rospy.loginfo(
+                    "We are correcting the heading")
+                rot_tolerance_to_goal_satisfied = True
+
+            if (dist_tolerance_to_goal_satisfied and rot_tolerance_to_goal_satisfied):
+                self.action_server.set_succeeded()
+
+            v_in, w_in = self.controller.compute_velocities(
+                curr_robot_pose, goal.goal_pose, dist_to_goal_satisfied=dist_tolerance_to_goal_satisfied)
+
+            msg = Twist()
+            msg.linear.x = v_in
+            msg.angular.z = w_in
+            self.cmd_vel_pub.publish(msg)
+
+            rate.sleep()
+
+
+def main():
+    rospy.init_node("NavigateToPoseServerNode")
+    NavigateToPoseServerNode()
+    rospy.spin()
+
+
+if __name__ == '__main__':
+    main()
