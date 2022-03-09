@@ -32,52 +32,54 @@ class NavigateToPoseServerNode():
         rospy.loginfo("Started naviagte_to_pose action")
 
     def server_callback(self, goal):
-
-        rospy.loginfo("received a navigation request to a goal")
+        rospy.loginfo("Recieved a goal")
         rospy.loginfo(goal.goal_pose)
+        dist_to_goal_satisfied = False
+        rot_to_goal_satisfied = False
 
         rate = rospy.Rate(15)
 
-        dist_tolerance_to_goal_satisfied = False
-        rot_tolerance_to_goal_satisfied = False
-
-        while not (dist_tolerance_to_goal_satisfied and rot_tolerance_to_goal_satisfied) and not rospy.is_shutdown():
+        while not (dist_to_goal_satisfied and rot_to_goal_satisfied) and not rospy.is_shutdown():
 
             if self.action_server.is_preempt_requested():
-                rospy.loginfo("Action request canceled")
+                rospy.loginfo("Preempted simple_nav action server")
                 self.action_server.set_preempted()
+                dist_to_goal_satisfied = True
+                rot_to_goal_satisfied = True
                 break
 
             curr_robot_pose = self.helpers.get_curr_robot_pose()
-            dist_to_goal = self.helpers.pose_euclidean_dist(
+            curr_dist_to_goal = self.helpers.pose_euclidean_dist(
                 curr_robot_pose.pose, goal.goal_pose.pose)
 
-            self.feedback.remaining_distance_to_goal = dist_to_goal
+            self.feedback.remaining_distance_to_goal = curr_dist_to_goal
             self.action_server.publish_feedback(self.feedback)
+
+            # VERY SIMPLE PURE PURSUIT CONTROLLER
             dist_error, rot_error = self.controller.compute_error(
                 curr_robot_pose, goal.goal_pose)
 
-            if dist_error < 0.05:
-                rospy.loginfo(
-                    "We arrived to goal, and now we will correct the heading")
-                dist_tolerance_to_goal_satisfied = True
+            if dist_error < 0.1:
+                rospy.loginfo("We are at goal now, correcting the heading")
+                dist_to_goal_satisfied = True
 
-            if rot_error < 0.05 and dist_tolerance_to_goal_satisfied:
+            if dist_to_goal_satisfied and (rot_error < 0.1):
                 rospy.loginfo(
-                    "We are correcting the heading")
-                rot_tolerance_to_goal_satisfied = True
+                    "Corrected the heading,")
+                rot_to_goal_satisfied = True
 
-            if (dist_tolerance_to_goal_satisfied and rot_tolerance_to_goal_satisfied):
+            if (dist_to_goal_satisfied and rot_to_goal_satisfied):
+                self.result.success = True
                 self.action_server.set_succeeded()
+                rospy.loginfo("Navigation was a success")
 
             v_in, w_in = self.controller.compute_velocities(
-                curr_robot_pose, goal.goal_pose, dist_to_goal_satisfied=dist_tolerance_to_goal_satisfied)
+                curr_robot_pose, goal.goal_pose, dist_to_goal_satisfied)
 
-            msg = Twist()
-            msg.linear.x = v_in
-            msg.angular.z = w_in
-            self.cmd_vel_pub.publish(msg)
-
+            computed_velocity = Twist()
+            computed_velocity.linear.x = v_in
+            computed_velocity.angular.z = w_in
+            self.cmd_vel_pub.publish(computed_velocity)
             rate.sleep()
 
 

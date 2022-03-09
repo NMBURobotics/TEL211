@@ -24,8 +24,8 @@ class NavigateToPoseClientNode():
         goal = NavigateToPoseGoal()
         goal.goal_pose.header.frame_id = "odom"
         goal.goal_pose.header.stamp = rospy.Time().now()
-        goal.goal_pose.pose.position.x = 14
-        goal.goal_pose.pose.position.y = -24
+        goal.goal_pose.pose.position.x = 4
+        goal.goal_pose.pose.position.y = -4
 
         self.action_client.send_goal(goal, feedback_cb=self.feedback_callback)
 
@@ -33,9 +33,9 @@ class NavigateToPoseClientNode():
         while self.action_client.get_state() != GoalStatus().SUCCEEDED:
             rospy.loginfo("The goal is still processing ...")
             rate.sleep()
-
             # if obstacle_detected:
             #    self.action_client.cancel_goal() #PAUSE
+        rospy.loginfo("Hooray! got on the right pose ...")
 
 
 def main():
