@@ -55,6 +55,10 @@ catkin_package(
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
+ catkin_install_python(PROGRAMS
+ nodes/action_client
+ DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
  install(DIRECTORY

@@ -57,12 +57,12 @@ class NavigateToPoseServerNode():
             dist_error, rot_error = self.controller.compute_error(
                 curr_robot_pose, goal.goal_pose)
 
-            if dist_error < 0.1:
+            if dist_error < 0.05:
                 rospy.loginfo(
                     "We arrived to goal, and now we will correct the heading")
                 dist_tolerance_to_goal_satisfied = True
 
-            if rot_error < 0.1:
+            if rot_error < 0.05 and dist_tolerance_to_goal_satisfied:
                 rospy.loginfo(
                     "We are correcting the heading")
                 rot_tolerance_to_goal_satisfied = True

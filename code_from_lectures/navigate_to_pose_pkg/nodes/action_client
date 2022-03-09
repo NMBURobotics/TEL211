@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+from pickle import TRUE
+import rospy
+import actionlib
+
+from navigate_to_pose_pkg.msg import NavigateToPoseAction
+from navigate_to_pose_pkg.msg import NavigateToPoseGoal
+from actionlib_msgs.msg import GoalStatus
+
+
+class NavigateToPoseClientNode():
+    def __init__(self, *args):
+        self.action_client = actionlib.SimpleActionClient(
+            "/navigate_to_pose", NavigateToPoseAction)
+        self.action_client.wait_for_server()
+        rospy.loginfo("We have connected to action server")
+
+    def feedback_callback(self, feedback):
+        rospy.loginfo("The Feedback is %s" % str(feedback))
+
+    def test_action_server(self):
+        rospy.loginfo("We are making a navigation request")
+        goal = NavigateToPoseGoal()
+        goal.goal_pose.header.frame_id = "odom"
+        goal.goal_pose.header.stamp = rospy.Time().now()
+        goal.goal_pose.pose.position.x = 14
+        goal.goal_pose.pose.position.y = -24
+
+        self.action_client.send_goal(goal, feedback_cb=self.feedback_callback)
+
+        rate = rospy.Rate(1)
+        while self.action_client.get_state() != GoalStatus().SUCCEEDED:
+            rospy.loginfo("The goal is still processing ...")
+            rate.sleep()
+
+            # if obstacle_detected:
+            #    self.action_client.cancel_goal() #PAUSE
+
+
+def main():
+    rospy.init_node("NavigateToPoseClientNode")
+    action_client = NavigateToPoseClientNode()
+    action_client.test_action_server()
+
+    rospy.spin()
+
+
+if __name__ == '__main__':
+    main()
