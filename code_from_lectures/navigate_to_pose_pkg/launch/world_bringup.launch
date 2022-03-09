@@ -4,11 +4,11 @@
     <arg name="use_thorvald" default="false" />
 
     <group unless="$(arg use_thorvald)">
-        <include file="$(find simple_nav_pkg)/launch/spawn_husky.launch" />
+        <include file="$(find navigate_to_pose_pkg)/launch/spawn_husky.launch" />
     </group>
 
     <group if="$(arg use_thorvald)">
-        <include file="$(find simple_nav_pkg)/launch/spawn_thorvald.launch" />
+        <include file="$(find navigate_to_pose_pkg)/launch/spawn_thorvald.launch" />
     </group>
 
 

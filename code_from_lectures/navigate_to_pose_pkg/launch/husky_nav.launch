@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <include file="$(find simple_nav_pkg)/launch/world_bringup.launch">
+    <include file="$(find navigate_to_pose_pkg)/launch/world_bringup.launch">
     </include>
 
     <node pkg="navigate_to_pose_pkg" type="action_server" name="action_server" output="screen">
