@@ -62,7 +62,7 @@ class PurePursuitController():
         self.angular_max = angular_max
         self.simple_nav_helper = SimpleNavHelpers()
 
-    def compute_error(self, curr_robot_pose,  curr_goal_pose):
+    def compute_error(self, curr_robot_pose,  curr_goal_pose, dist_to_goal_satisfied):
 
         robot_quat_exp = [curr_robot_pose.pose.orientation.x, curr_robot_pose.pose.orientation.y,
                           curr_robot_pose.pose.orientation.z, curr_robot_pose.pose.orientation.w]
@@ -81,8 +81,12 @@ class PurePursuitController():
                      curr_goal_pose.pose.position.y - curr_robot_pose.pose.position.y,
                      robot_yaw - goal_yaw]
 
+        if dist_to_goal_satisfied:
+            rot_error = goal_yaw - robot_yaw
+        else:
+            rot_error = math.atan2(err_local[1], err_local[0]) - robot_yaw
+
         dist_error = math.sqrt(err_local[0]**2 + err_local[1]**2)
-        rot_error = err_local[2]
 
         return dist_error, rot_error
 

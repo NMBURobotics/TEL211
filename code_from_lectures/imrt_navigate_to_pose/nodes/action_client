@@ -4,9 +4,13 @@ from pickle import TRUE
 import rospy
 import actionlib
 
-from navigate_to_pose_pkg.msg import NavigateToPoseAction
-from navigate_to_pose_pkg.msg import NavigateToPoseGoal
+from imrt_navigate_to_pose.msg import NavigateToPoseAction
+from imrt_navigate_to_pose.msg import NavigateToPoseGoal
 from actionlib_msgs.msg import GoalStatus
+
+
+from tf.transformations import quaternion_from_euler
+from geometry_msgs.msg import Quaternion
 
 
 class NavigateToPoseClientNode():
@@ -25,7 +29,9 @@ class NavigateToPoseClientNode():
         goal.goal_pose.header.frame_id = "odom"
         goal.goal_pose.header.stamp = rospy.Time().now()
         goal.goal_pose.pose.position.x = 4
-        goal.goal_pose.pose.position.y = -4
+        goal.goal_pose.pose.position.y = -5
+        goal.goal_pose.pose.orientation = Quaternion(
+            *quaternion_from_euler(0, 0, 1.57))
 
         self.action_client.send_goal(goal, feedback_cb=self.feedback_callback)
 

@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 
-from pickle import TRUE
 import rospy
 import actionlib
 
-from navigate_to_pose_pkg.simple_nav_helpers import PurePursuitController
-from navigate_to_pose_pkg.simple_nav_helpers import SimpleNavHelpers
-
-from navigate_to_pose_pkg.msg import NavigateToPoseAction
-from navigate_to_pose_pkg.msg import NavigateToPoseFeedback
-from navigate_to_pose_pkg.msg import NavigateToPoseResult
+from imrt_navigate_to_pose.simple_nav_helpers import PurePursuitController
+from imrt_navigate_to_pose.simple_nav_helpers import SimpleNavHelpers
+from imrt_navigate_to_pose.msg import NavigateToPoseAction
+from imrt_navigate_to_pose.msg import NavigateToPoseFeedback
+from imrt_navigate_to_pose.msg import NavigateToPoseResult
 
 from geometry_msgs.msg import Twist
 
@@ -21,28 +19,40 @@ class NavigateToPoseServerNode():
         self.result = NavigateToPoseResult()
 
         self.action_server = actionlib.SimpleActionServer(
-            "/navigate_to_pose", NavigateToPoseAction, execute_cb=self.server_callback, auto_start=False)
+            "/navigate_to_pose", NavigateToPoseAction,
+            execute_cb=self.server_callback, auto_start=False)
         self.action_server.start()
 
         self.cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
 
         self.helpers = SimpleNavHelpers()
-        self.controller = PurePursuitController(1.0, 5.0, 0.5, 0.5)
 
-        rospy.loginfo("Started naviagte_to_pose action")
+        linear_k = 1.0
+        angular_k = 5.0
+        linear_max = 0.5
+        angular_max = 0.5
+        self.controller = PurePursuitController(
+            linear_k, angular_k, linear_max, angular_max)
+
+        self.dist_error_tolerance = 0.05  # m/s
+        self.rotation_error_tolerance = 0.05  # rad/s
+
+        rospy.loginfo("Started /navigate_to_pose action server")
 
     def server_callback(self, goal):
-        rospy.loginfo("Recieved a goal")
+        rospy.loginfo("Recieved a goal from client")
         rospy.loginfo(goal.goal_pose)
+
         dist_to_goal_satisfied = False
         rot_to_goal_satisfied = False
-
         rate = rospy.Rate(15)
 
         while not (dist_to_goal_satisfied and rot_to_goal_satisfied) and not rospy.is_shutdown():
 
+            # Check if client requested a cancel
             if self.action_server.is_preempt_requested():
-                rospy.loginfo("Preempted simple_nav action server")
+                rospy.loginfo(
+                    "Preempting the goal on /navigate_to_pose action server")
                 self.action_server.set_preempted()
                 dist_to_goal_satisfied = True
                 rot_to_goal_satisfied = True
@@ -52,18 +62,20 @@ class NavigateToPoseServerNode():
             curr_dist_to_goal = self.helpers.pose_euclidean_dist(
                 curr_robot_pose.pose, goal.goal_pose.pose)
 
+            # Periodically publish feedback
             self.feedback.remaining_distance_to_goal = curr_dist_to_goal
             self.action_server.publish_feedback(self.feedback)
 
             # VERY SIMPLE PURE PURSUIT CONTROLLER
             dist_error, rot_error = self.controller.compute_error(
-                curr_robot_pose, goal.goal_pose)
+                curr_robot_pose, goal.goal_pose, dist_to_goal_satisfied)
 
-            if dist_error < 0.1:
-                rospy.loginfo("We are at goal now, correcting the heading")
+            if dist_error < self.dist_error_tolerance:
+                rospy.loginfo(
+                    "We are at goal now, adjusting to correct heading")
                 dist_to_goal_satisfied = True
 
-            if dist_to_goal_satisfied and (rot_error < 0.1):
+            if dist_to_goal_satisfied and (abs(rot_error) < self.rotation_error_tolerance):
                 rospy.loginfo(
                     "Corrected the heading,")
                 rot_to_goal_satisfied = True
@@ -76,6 +88,7 @@ class NavigateToPoseServerNode():
             v_in, w_in = self.controller.compute_velocities(
                 curr_robot_pose, goal.goal_pose, dist_to_goal_satisfied)
 
+            # Publish required velocity commands
             computed_velocity = Twist()
             computed_velocity.linear.x = v_in
             computed_velocity.angular.z = w_in

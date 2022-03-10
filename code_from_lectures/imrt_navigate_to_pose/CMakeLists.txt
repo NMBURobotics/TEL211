@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(navigate_to_pose_pkg)
+project(imrt_navigate_to_pose)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
@@ -43,7 +43,7 @@ catkin_python_setup()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES navigate_to_pose_pkg
+#  LIBRARIES imrt_navigate_to_pose
 #  CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs message_generation message_runtime rospy std_msgs
 #  DEPENDS system_lib
 )
